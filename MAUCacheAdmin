@@ -1,0 +1,321 @@
+#!/bin/sh
+#set -x
+
+TOOL_NAME="Microsoft AutoUpdate Cache Admin"
+TOOL_VERSION="1.0"
+
+## Copyright (c) 2016 Microsoft Corp. All rights reserved.
+## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
+## Microsoft disclaims all implied warranties including, without limitation, any implied warranties of merchantability or of fitness for a 
+## particular purpose. The entire risk arising out of the use or performance of the scripts and documentation remains with you. In no event shall
+## Microsoft, its authors, or anyone else involved in the creation, production, or delivery of the scripts be liable for any damages whatsoever 
+## (including, without limitation, damages for loss of business profits, business interruption, loss of business information, or other pecuniary 
+## loss) arising out of the use of or inability to use the sample scripts or documentation, even if Microsoft has been advised of the possibility
+## of such damages.
+## Feedback: pbowden@microsoft.com
+
+# Constants
+MAUID_MAU3X="0409MSAU03"
+MAUID_WORD2016="0409MSWD15"
+MAUID_EXCEL2016="0409XCEL15"
+MAUID_POWERPOINT2016="0409PPT315"
+MAUID_OUTLOOK2016="0409OPIM15"
+MAUID_ONENOTE2016="0409ONMC15"
+MAUID_OFFICE2011="0409MSOF14"
+MAUID_LYNC2011="0409UCCP14"
+MAUID_SKYPE2016="0409MSFB16"
+CHANNEL_COLLATERAL_PROD="https://officecdn.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/OfficeMac/"
+SCRATCH_AREA="$TMPDIR""MAUCacheAdmin"
+
+function ShowUsage {
+# Shows tool usage and parameters
+	echo $TOOL_NAME - $TOOL_VERSION
+	echo "Purpose: Downloads MAU collateral and packages from the Office CDN to a local web server"
+	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--HTTPOnly] [--NoCollateral]"
+	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CheckInterval:60"
+	echo
+	exit 0
+}
+
+function InitializeScratchArea {
+# Creates and cleans temporary file area
+	if [ -d "$SCRATCH_AREA" ]; then
+		rm -i -f "$SCRATCH_AREA""*"
+	else
+		mkdir "$SCRATCH_AREA"
+	fi
+}
+
+function InitializeCacheArea {
+# Verifies cache area connectivity and cleans up as necessary
+	if [ ! -d "$CACHEPATH" ]; then
+		echo "Error: $CACHEPATH is not accessible"
+		echo
+		exit 1
+	fi
+}
+
+function ResolveDownloadUrl {
+# Selects either HTTPS from the Office CDN origin, or HTTP directly from Akamai
+	if [ "$HTTPONLY" ]; then
+		HTTPURL=(${1/https/http})
+		FILEURL=(${HTTPURL/officecdn.microsoft.com/officecdn.microsoft.com.edgesuite.net})
+	else
+		FILEURL="$1"
+	fi
+	echo "$FILEURL"
+}
+
+function BuildApplicationArray {
+# Builds an array of all the MAU-enabled applications that we care about
+	MAUAPP[0]="$MAUID_MAU3X"
+	MAUAPP[1]="$MAUID_WORD2016"
+	MAUAPP[2]="$MAUID_EXCEL2016"
+	MAUAPP[3]="$MAUID_POWERPOINT2016"
+	MAUAPP[4]="$MAUID_OUTLOOK2016"
+	MAUAPP[5]="$MAUID_ONENOTE2016"
+	MAUAPP[6]="$MAUID_OFFICE2011"
+	MAUAPP[7]="$MAUID_LYNC2011"
+	MAUAPP[8]="$MAUID_SKYPE2016"
+}
+
+function BuildCollateralArray {
+# Builds an array of MAU collateral file-paths which we'll use later for downloading XML and CAT files
+	DOWNLOADARRAY[0]="$1"$MAUID_MAU3X
+	DOWNLOADARRAY[1]="$1"$MAUID_WORD2016
+	DOWNLOADARRAY[2]="$1"$MAUID_EXCEL2016
+	DOWNLOADARRAY[3]="$1"$MAUID_POWERPOINT2016
+	DOWNLOADARRAY[4]="$1"$MAUID_OUTLOOK2016
+	DOWNLOADARRAY[5]="$1"$MAUID_ONENOTE2016
+	DOWNLOADARRAY[6]="$1"$MAUID_OFFICE2011
+	DOWNLOADARRAY[7]="$1"$MAUID_LYNC2011
+	DOWNLOADARRAY[8]="$1"$MAUID_SKYPE2016
+}
+
+function DownloadCollateralFiles {
+# Downloads XML/CAT collateral files
+	for i in "$@"
+	do
+		echo Downloading collateral file: "$i"
+		(cd "$SCRATCH_AREA" && curl --progress-bar --remote-name --location "$i.{xml,cat}")
+	done
+}
+
+function DownloadProductionBuildSource {
+# Downloads list of official production builds
+	local CHANNELURL="$1"
+	(cd "$SCRATCH_AREA" && curl --progress-bar --remote-name --location "$CHANNELURL/builds.txt")
+	IFS=$'\n' read -d '' -r -a PRODBUILDS < "$SCRATCH_AREA""/builds.txt"
+	if [[ "$PRODBUILDS[0]" == "1"* ]]; then
+		return
+	else
+		PRODBUILDS=""
+	fi
+}
+
+
+function ArchiveCollateralFiles {
+# Archives collateral files in the cache folder
+	local APPID="$1"
+	if [ $NOCOLLATERAL ]; then
+		return
+	else
+		if [ ! -d "$CACHEPATH/collateral" ]; then
+			mkdir "$CACHEPATH/collateral"
+		fi
+		local APPVER=$(GetAppVersionFromXML "$APPID")
+		if [ ! -d "$CACHEPATH/collateral/$APPVER" ]; then
+			mkdir "$CACHEPATH/collateral/$APPVER"
+		fi
+		cp "$SCRATCH_AREA/$APPID.xml" "$CACHEPATH/collateral/$APPVER"
+		cp "$SCRATCH_AREA/$APPID.cat" "$CACHEPATH/collateral/$APPVER"
+	fi
+}
+
+function DownloadUpdatePackages {
+# Logic to evaluate what files need to be downloaded into the cache
+	APPID="$1"
+	APPNAME=$(GetAppNameFromMAUID "$1")
+	if [ "$APPID" == "0409MSOF14" ] || [ "$APPID" == "0409UCCP14" ]; then
+		LOCATION=($(cd $SCRATCH_AREA && (grep -o 'http[^\"]*dmg' $APPID".xml") | sort | uniq))
+	else
+		LOCATION=($(cd $SCRATCH_AREA && (grep -o 'http[^\"]*pkg' $APPID".xml") | sort | uniq))
+	fi
+	for i in "${LOCATION[@]}"
+	do
+		SKIPDOWNLOAD=false
+		PACKAGENAME=$(basename "$i")
+		if [[ $PACKAGENAME == *"Delta"* ]]; then
+			for PRODVER in "${PRODBUILDS[@]}"
+			do
+				echo $PRODVER
+				if [[ $PACKAGENAME == *"$PRODVER""_to_"* ]]; then
+					SKIPDOWNLOAD=false
+					break
+				else
+					SKIPDOWNLOAD=true
+				fi
+			done
+		fi
+		if [ "$SKIPDOWNLOAD" == false ]; then
+			PACKAGEURL=$(ResolveDownloadUrl "$i")
+			PACKAGESIZECDN=$(GetDownloadSize "$i")
+			PACKAGESIZELOCAL=$(GetLocalSize "$PACKAGENAME")
+			PACKAGESIZECDNMEG=$(expr $PACKAGESIZECDN / 1024 / 1024)
+			if [ -f "$CACHEPATH/$PACKAGENAME" ]; then
+				if [ "$PACKAGESIZELOCAL" == "$PACKAGESIZECDN" ]; then
+					echo Package "$i" already exists in the cache ...skipping
+				else
+					echo Package "$i" exists in the cache but is corrupt ...removing
+					(cd "$CACHEPATH" && rm -f "$i")
+					DownloadPackage "$PACKAGEURL" "$APPNAME" "$PACKAGESIZECDNMEG"
+				fi
+			else
+				DownloadPackage "$PACKAGEURL" "$APPNAME" "$PACKAGESIZECDNMEG"
+			fi
+		fi
+	done
+}
+
+function GetAppVersionFromXML {
+# Returns the current app version from the XML collateral
+	XML="$1"".xml"
+	local APPVER=($(cd $SCRATCH_AREA && grep -o -A1 -m2 'Update Version' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g'))
+	if [ "$APPVER" == '' ]; then
+		echo "Legacy"
+	else
+		echo "$APPVER"
+	fi
+}
+
+function GetAppNameFromMAUID {
+# Performs a reverse look-up from MAUID to friendly name
+	case "$1" in
+		$MAUID_MAU3X)			APPNAME="MAU 3.x"
+								;;
+		$MAUID_WORD2016)		APPNAME="Word 2016"
+								;;
+		$MAUID_EXCEL2016)		APPNAME="Excel 2016"
+								;;
+		$MAUID_POWERPOINT2016)	APPNAME="PowerPoint 2016"
+								;;
+		$MAUID_OUTLOOK2016)		APPNAME="Outlook 2016"
+								;;
+		$MAUID_ONENOTE2016)		APPNAME="OneNote 2016"
+								;;
+		$MAUID_OFFICE2011)		APPNAME="Office 2011"
+								;;
+		$MAUID_LYNC2011)		APPNAME="Lync 2011"
+								;;
+		$MAUID_LYNC2011)		APPNAME="Skype for Business 2016"
+								;;
+	esac
+	echo "$APPNAME"
+}
+
+function GetDownloadSize {
+# Gets the size of a file based on it's header, then strips non-numeric characters
+	URL="$1"
+	local CONTENTHTTPLENGTH=$(curl --head -s $URL | awk '/Content-Length/' | cut -d ' ' -f2)
+	CONTENTLENGTH=$(echo ${CONTENTHTTPLENGTH//[!0-9]/})
+	echo $CONTENTLENGTH
+}
+
+function GetLocalSize {
+# Gets the size of a file from the local disk
+	local FILENAME="$1"
+	local FILELENGTH=($(cd "$CACHEPATH" && stat -f%z "$FILENAME"))
+	echo $FILELENGTH
+}
+
+function DownloadPackage {
+# Downloads the specified update package
+	URL="$1"	
+	APPLICATION="$2"
+	SIZE="$3"
+	PACKAGE=$(basename "$1")
+	echo "==================================================="
+	echo Application: "$APPLICATION"
+	echo Package:     "$PACKAGE"
+	echo Size:        "$SIZE" MB
+	echo URL:         "$URL"
+	(cd $CACHEPATH && curl --progress-bar --remote-name --location $URL)
+}
+
+
+# Evaluate command-line arguments
+if [[ $# = 0 ]]; then
+	ShowUsage
+else
+	for KEY in "$@"
+	do
+	case $KEY in
+    	--Help|-?|--help)
+    	ShowUsage
+    	shift # past argument
+    	;;
+    	--CachePath:*|-c:*|--cachepath:*)
+    	CACHEPATH=${KEY#*:}
+    	shift # past argument
+    	;;
+    	--CheckInterval:*|-i:*|--checkinterval:*)
+    	CHECKINTERVAL=${KEY#*:}
+    	shift # past argument
+    	;;
+    	--HTTPOnly|-h|--httponly)
+    	HTTPONLY=true
+    	shift # past argument
+    	;;
+    	--NoCollateral|-n|--nocollateral)
+    	NOCOLLATERAL=true
+    	shift # past argument
+    	;;
+    	*)
+    	ShowUsage
+    	;;
+	esac
+	shift # past argument or value
+	done
+fi
+
+## Main
+while :
+do
+	# Get a clean area for writing temporary files
+	InitializeScratchArea
+	# Verify that the cache area is ready to go
+	InitializeCacheArea
+	# Build channel array
+	CHANNELS[0]="$CHANNEL_COLLATERAL_PROD"
+	# Routine for all channels in the array
+	for c in "${CHANNELS[@]}"
+	do
+		# Resolve collateral download URL
+		COLLATERALURL=$(ResolveDownloadUrl "$c")
+		# Download list of production builds as source
+		DownloadProductionBuildSource "$COLLATERALURL"
+		# Build an array of the collateral files to download
+		BuildCollateralArray "$COLLATERALURL"
+		# Download collateral files for each application
+		DownloadCollateralFiles "${DOWNLOADARRAY[@]}"
+		# Build an array of all MAU-enabled applications
+		BuildApplicationArray
+		# Build an array of each package location and download those packages
+		for a in "${MAUAPP[@]}"
+		do
+			ArchiveCollateralFiles "$a"
+			DownloadUpdatePackages "$a" "$c"
+		done
+	done
+	
+	# If CheckInterval wasn't specified on the command-line, default to 10 minutes
+	if [ "$CHECKINTERVAL" == '' ]; then
+		CHECKINTERVAL=10
+	fi
+	echo "Sleeping for $CHECKINTERVAL minutes..."
+	CHECKINTERVALSECS=$(expr $CHECKINTERVAL \* 60)
+	# Wait until the next check interval
+	sleep "$CHECKINTERVALSECS"
+done
+
+exit 0
