@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="1.0"
+TOOL_VERSION="1.1"
 
 ## Copyright (c) 2016 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -113,7 +113,6 @@ function DownloadProductionBuildSource {
 	fi
 }
 
-
 function ArchiveCollateralFiles {
 # Archives collateral files in the cache folder
 	local APPID="$1"
@@ -148,7 +147,6 @@ function DownloadUpdatePackages {
 		if [[ $PACKAGENAME == *"Delta"* ]]; then
 			for PRODVER in "${PRODBUILDS[@]}"
 			do
-				echo $PRODVER
 				if [[ $PACKAGENAME == *"$PRODVER""_to_"* ]]; then
 					SKIPDOWNLOAD=false
 					break
@@ -239,7 +237,7 @@ function DownloadPackage {
 	echo Package:     "$PACKAGE"
 	echo Size:        "$SIZE" MB
 	echo URL:         "$URL"
-	(cd $CACHEPATH && curl --progress-bar --remote-name --location $URL)
+	(cd "$CACHEPATH" && curl --progress-bar --remote-name --location $URL)
 }
 
 
