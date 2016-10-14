@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="1.1"
+TOOL_VERSION="1.2"
 
 ## Copyright (c) 2016 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -26,6 +26,9 @@ MAUID_LYNC2011="0409UCCP14"
 MAUID_SKYPE2016="0409MSFB16"
 CHANNEL_COLLATERAL_PROD="https://officecdn.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/OfficeMac/"
 SCRATCH_AREA="$TMPDIR""MAUCacheAdmin"
+
+# Platform detection
+PLATFORM=$(uname -s)
 
 function ShowUsage {
 # Shows tool usage and parameters
@@ -178,7 +181,11 @@ function DownloadUpdatePackages {
 function GetAppVersionFromXML {
 # Returns the current app version from the XML collateral
 	XML="$1"".xml"
-	local APPVER=($(cd $SCRATCH_AREA && grep -o -A1 -m2 'Update Version' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g'))
+	if [ "$PLATFORM" == "Darwin" ]; then
+		local APPVER=($(cd $SCRATCH_AREA && grep -o -A1 -m2 'Update Version' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g'))
+	else
+		local APPVER=($(cd $SCRATCH_AREA && grep -o -A1 -m2 'Update Version' "$XML" | grep 'string' | sed -e 's,.<string>\([^<]*\)</string>.,\1,g'))
+	fi
 	if [ "$APPVER" == '' ]; then
 		echo "Legacy"
 	else
@@ -222,7 +229,12 @@ function GetDownloadSize {
 function GetLocalSize {
 # Gets the size of a file from the local disk
 	local FILENAME="$1"
-	local FILELENGTH=($(cd "$CACHEPATH" && stat -f%z "$FILENAME"))
+	# The stat command works differently between macOS and other Linux platforms like RHEL
+	if [ "$PLATFORM" == "Darwin" ]; then
+		local FILELENGTH=($(cd "$CACHEPATH" && stat -f%z "$FILENAME"))
+	else
+		local FILELENGTH=($(cd "$CACHEPATH" && stat -c%s "$FILENAME"))
+	fi
 	echo $FILELENGTH
 }
 
@@ -306,14 +318,16 @@ do
 		done
 	done
 	
-	# If CheckInterval wasn't specified on the command-line, default to 10 minutes
+	# If CheckInterval wasn't specified on the command-line, just run once
 	if [ "$CHECKINTERVAL" == '' ]; then
-		CHECKINTERVAL=10
+		exit 0
+	else
+	# Otherwise, sleep for the specified number of minutes before checking again
+		echo "Sleeping for $CHECKINTERVAL minutes..."
+		CHECKINTERVALSECS=$(expr $CHECKINTERVAL \* 60)
+		# Wait until the next check interval
+		sleep "$CHECKINTERVALSECS"
 	fi
-	echo "Sleeping for $CHECKINTERVAL minutes..."
-	CHECKINTERVALSECS=$(expr $CHECKINTERVAL \* 60)
-	# Wait until the next check interval
-	sleep "$CHECKINTERVALSECS"
 done
 
 exit 0
