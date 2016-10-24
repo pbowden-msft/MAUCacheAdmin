@@ -208,7 +208,7 @@ function GetAppNameFromMAUID {
 								;;
 		$MAUID_LYNC2011)		APPNAME="Lync 2011"
 								;;
-		$MAUID_LYNC2011)		APPNAME="Skype for Business 2016"
+		$MAUID_SKYPE2016)		APPNAME="Skype for Business 2016"
 								;;
 	esac
 	echo "$APPNAME"
