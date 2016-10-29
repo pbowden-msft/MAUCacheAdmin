@@ -1,0 +1,12 @@
+[Unit]
+Description=Microsoft AutoUpdate Cache Admin Runner
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c "/usr/local/MAUCacheAdmin --CachePath:/var/www/html --CheckInterval:15"
+ExecStopPost=/bin/sh -c 'echo "The MAUCacheAdmin service has stopped: Automatic restart in 5 minutes." | /usr/bin/mail -s "MAUCacheAdmin Stopped" -a "From: MAUCacheAdmin <admin@maucacheserver>" you@your.org'
+Restart=always
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target
