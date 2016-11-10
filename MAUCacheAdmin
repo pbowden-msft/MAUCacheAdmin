@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="1.34"
+TOOL_VERSION="1.36"
 
 ## Copyright (c) 2016 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -34,8 +34,10 @@ function ShowUsage {
 # Shows tool usage and parameters
 	echo $TOOL_NAME - $TOOL_VERSION
 	echo "Purpose: Downloads MAU collateral and packages from the Office CDN to a local web server"
-	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--HTTPOnly] [--NoCollateral]"
+	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--HTTPOnly] [--NoCollateral] [--ShowCollateral] [--CopyCollateralFrom:<from Folder>] [--CopyCollateralTo:<to Folder>]"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CheckInterval:60"
+	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --ShowCollateral"
+	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CopyCollateralFrom:15.27.16101000 --CopyCollateralTo:Production"
 	echo
 	exit 0
 }
@@ -248,6 +250,58 @@ function DownloadPackage {
 	(cd "$CACHEPATH" && curl --progress-bar --remote-name --location $URL)
 }
 
+function ShowCollateral () {
+# Shows collateral information of the downloaded collateral files
+echo "----------------------------------------------------------------------------------------"
+printf '%-14s %-42s %-11s %s\n' \
+        "App ID" "Application" "Build Date" "[Folder]"
+echo "----------------------------------------------------------------------------------------"
+
+for d in "$CACHEPATH/collateral/"*;
+do
+  cd "$d/";
+  if ls *.xml >/dev/null 2>&1; then
+	  for XML in *.xml; 
+	  do
+	  Folder=$(echo "$d" | awk -F "/" '{print $NF}')
+	  if [ "$Folder" = "Legacy" ]; then
+			AppIdentifier=$(echo "$XML" | sed -e 's/.xml//g')
+			ver=""
+			BuildDate=$(grep -A1 'Date' "$XML" | grep 'date' | sed -e 's,.*<date>\([^<]*\)</date>.*,\1,g' | tail -1 | cut -d"T" -f1)
+			AppTitle=$(grep -A1 'Title' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g' | tail -1)
+			
+			printf '%-14s %-42s %-11s %s\n' \
+			"$AppIdentifier" "$AppTitle" "$BuildDate" "[$Folder]"
+	  else
+			AppIdentifier=$(echo "$XML" | sed -e 's/.xml//g')
+			ver=$(grep -A1 -m2 'Update Version' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g')
+			BuildDate=$(grep -A1 'Date' "$XML" | grep 'date' | sed -e 's,.*<date>\([^<]*\)</date>.*,\1,g' | tail -1 | cut -d"T" -f1)
+			AppTitle=$(grep -A1 'Title' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g' | tail -1)
+					
+			printf '%-14s %-42s %-11s %s\n' \
+			"$AppIdentifier" "$AppTitle" "$BuildDate" "[$Folder]"
+	  fi
+	  done
+	else
+		Folder=$(echo "$d" | awk -F "/" '{print $NF}')
+		
+		printf '%-14s %-42s %-11s %s\n' \
+        "" "" "" "[$Folder]"
+	fi
+done
+echo "----------------------------------------------------------------------------------------"
+exit 0
+}
+
+function CopyCollateral () {
+# Copies collateral files from one folder to another.
+	COPYCOLLATERALFROM=$(echo $COPYCOLLATERALFROM | sed 's/[][]//g')
+	COPYCOLLATERALTO=$(echo $COPYCOLLATERALTO | sed 's/[][]//g')
+	echo "Copying collateral files FROM:[$COPYCOLLATERALFROM] folder TO:[$COPYCOLLATERALTO] folder."
+	cp "$CACHEPATH/collateral/$COPYCOLLATERALFROM/"* "$CACHEPATH/collateral/$COPYCOLLATERALTO/"
+	exit 0
+}
+
 
 # Evaluate command-line arguments
 if [[ $# = 0 ]]; then
@@ -256,7 +310,7 @@ else
 	for KEY in "$@"
 	do
 	case $KEY in
-    	--Help|-?|--help)
+    	--Help|-h|--help)
     	ShowUsage
     	shift # past argument
     	;;
@@ -274,6 +328,19 @@ else
     	;;
     	--NoCollateral|-n|--nocollateral)
     	NOCOLLATERAL=true
+    	shift # past argument
+    	;;
+    	--ShowCollateral|-sc|--showcollateral)
+    	ShowCollateral
+    	shift # past argument
+    	;;
+    	--CopyCollateralFrom:*|-ccf:*|--copycollateralfrom:*)
+    	COPYCOLLATERALFROM=${KEY#*:}
+    	shift # past argument
+    	;;
+    	--CopyCollateralTo:*|-cct:*|--copycollateralto:*)
+    	COPYCOLLATERALTO=${KEY#*:}
+    	CopyCollateral
     	shift # past argument
     	;;
     	*)
