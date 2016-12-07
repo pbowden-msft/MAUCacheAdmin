@@ -23,3 +23,6 @@ sudo systemctl daemon-reload
 sudo systemctl start maucache.service
 sudo systemctl status maucache.service
 ```
+## psMacUpdatesOFFICE.ps1
+
+A PowerShell port of the MAUCacheAdmin script from Adam and David from The University of Newcastle in Australia
