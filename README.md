@@ -26,3 +26,4 @@ sudo systemctl status maucache.service
 ## psMacUpdatesOFFICE.ps1
 
 A PowerShell port of the MAUCacheAdmin script from Adam and David from The University of Newcastle in Australia
+`PowerShell.exe -executionpolicy bypass -file psMacUpdatesOFFICE.ps1 -channel Production -IISRoot C:\inetpub\wwwroot -IisFolder maucache -TempShare C:\Temp`
