@@ -1,27 +1,26 @@
 ﻿<#
     .Synopsis
-    Download MAU update for Mac
+    Download MAU update for mac
     .DESCRIPTION
     Authors - Adam Martin, David Coupe
-    Based on shell script by pbowden@microsoft.com
+    Based on Bash script by pbowden@microsoft.com
     Needs to run as administator to allow file rights
     Creates directory structure for iis 
     Downloads updates to tempory structure
     Delets original files from iis
     moves new downloads to IIS structure
-    Ensure you have IIS running prior to use
     .PARAMETER Channel
     Must supply channel. Values accaptable are "Production", "External", "InsiderFast"
     .PARAMETER IISRoot
     Must supply iisBase. The path to default IIS eg C:\inetpub\wwwroot
     .PARAMETER IisFolder
-    Must supply channel. The Folder name of the Share to publish in iss. Eg MAUCache
+    Must supply channel. The Folder name of the Share to publish in iis. Eg MAUCache
     .PARAMETER Channel
     Must supply TempShare. Path For working folder. Everything is downloaded then moved from this location. Eg c:\temp
     .EXAMPLE
     powershell.exe .\psMacUpdatesOFFICE.ps1 -channel Production -IISRoot C:\inetpub\wwwroot -IisFolder maucache -TempShare C:\temp
     .EXAMPLE
-    powershell.exe .\psMacUpdatesOFFICE.ps1 -channel External -IISRoot C:\inetpub\wwwroot -IisFolder maucacheexternal -TempShare C:\temp -verbose
+    powershell.exe .\psMacUpdatesOFFICE.ps1 -channel Production -IISRoot C:\inetpub\wwwroot -IisFolder maucache -TempShare C:\temp -verbose
  #>
  [cmdletbinding()]
   Param(
@@ -77,7 +76,7 @@ If (Test-path -Path $tempFolder)
 
 }
 #Create TEmp Structure
-  New-Item -ItemType Directory -Path $tempfolderlocation -Name "$PublishFolderName"
+  New-Item -ItemType Directory -Path $tempfolderlocation -Name "$PublishFolderName" 
   New-Item -ItemType Directory -Path "$tempfolder" -Name "Collateral"
   
   
@@ -235,6 +234,7 @@ DownloadCollateralFiles -downloadarray $mauApp -weburldown $webUrlDownload
 if ((Get-ChildItem $tempfolder).count -ge 10){
 
   Remove-Item $PublishFolder -recurse -Force
+  start-sleep -Seconds 30
   Move-Item -Path $tempfolder -Destination "$publishBasePath"  
 
 }
