@@ -2,9 +2,9 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="1.36"
+TOOL_VERSION="1.37"
 
-## Copyright (c) 2016 Microsoft Corp. All rights reserved.
+## Copyright (c) 2017 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
 ## Microsoft disclaims all implied warranties including, without limitation, any implied warranties of merchantability or of fitness for a 
 ## particular purpose. The entire risk arising out of the use or performance of the scripts and documentation remains with you. In no event shall
@@ -30,11 +30,11 @@ SCRATCH_AREA="$TMPDIR""MAUCache"
 # Platform detection
 PLATFORM=$(uname -s)
 
-function ShowUsage {
+ShowUsage () {
 # Shows tool usage and parameters
 	echo $TOOL_NAME - $TOOL_VERSION
 	echo "Purpose: Downloads MAU collateral and packages from the Office CDN to a local web server"
-	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--HTTPOnly] [--NoCollateral] [--ShowCollateral] [--CopyCollateralFrom:<from Folder>] [--CopyCollateralTo:<to Folder>]"
+	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--HTTPOnly] [--NoPackages] [--NoCollateral] [--ShowCollateral] [--CopyCollateralFrom:<from Folder>] [--CopyCollateralTo:<to Folder>]"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CheckInterval:60"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --ShowCollateral"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CopyCollateralFrom:15.27.16101000 --CopyCollateralTo:Production"
@@ -42,7 +42,7 @@ function ShowUsage {
 	exit 0
 }
 
-function InitializeScratchArea {
+InitializeScratchArea () {
 # Creates and cleans temporary file area
 	if [ -d "$SCRATCH_AREA" ]; then
 		rm -i -f "$SCRATCH_AREA""*"
@@ -51,7 +51,7 @@ function InitializeScratchArea {
 	fi
 }
 
-function InitializeCacheArea {
+InitializeCacheArea () {
 # Verifies cache area connectivity and cleans up as necessary
 	if [ ! -d "$CACHEPATH" ]; then
 		echo "Error: $CACHEPATH is not accessible"
@@ -60,7 +60,7 @@ function InitializeCacheArea {
 	fi
 }
 
-function ResolveDownloadUrl {
+ResolveDownloadUrl () {
 # Selects either HTTPS from the Office CDN origin, or HTTP directly from Akamai
 	if [ "$HTTPONLY" ]; then
 		HTTPURL=(${1/https/http})
@@ -71,7 +71,7 @@ function ResolveDownloadUrl {
 	echo "$FILEURL"
 }
 
-function BuildApplicationArray {
+BuildApplicationArray () {
 # Builds an array of all the MAU-enabled applications that we care about
 	MAUAPP[0]="$MAUID_MAU3X"
 	MAUAPP[1]="$MAUID_WORD2016"
@@ -84,7 +84,7 @@ function BuildApplicationArray {
 	MAUAPP[8]="$MAUID_SKYPE2016"
 }
 
-function BuildCollateralArray {
+BuildCollateralArray () {
 # Builds an array of MAU collateral file-paths which we'll use later for downloading XML and CAT files
 	DOWNLOADARRAY[0]="$1"$MAUID_MAU3X
 	DOWNLOADARRAY[1]="$1"$MAUID_WORD2016
@@ -97,7 +97,7 @@ function BuildCollateralArray {
 	DOWNLOADARRAY[8]="$1"$MAUID_SKYPE2016
 }
 
-function DownloadCollateralFiles {
+DownloadCollateralFiles () {
 # Downloads XML/CAT collateral files
 	for i in "$@"
 	do
@@ -106,7 +106,7 @@ function DownloadCollateralFiles {
 	done
 }
 
-function DownloadProductionBuildSource {
+DownloadProductionBuildSource () {
 # Downloads list of official production builds
 	local CHANNELURL="$1"
 	(cd "$SCRATCH_AREA" && curl --progress-bar --remote-name --location "$CHANNELURL/builds.txt")
@@ -118,7 +118,7 @@ function DownloadProductionBuildSource {
 	fi
 }
 
-function ArchiveCollateralFiles {
+ArchiveCollateralFiles () {
 # Archives collateral files in the cache folder
 	local APPID="$1"
 	if [ $NOCOLLATERAL ]; then
@@ -136,7 +136,7 @@ function ArchiveCollateralFiles {
 	fi
 }
 
-function DownloadUpdatePackages {
+DownloadUpdatePackages () {
 # Logic to evaluate what files need to be downloaded into the cache
 	APPID="$1"
 	APPNAME=$(GetAppNameFromMAUID "$1")
@@ -180,7 +180,7 @@ function DownloadUpdatePackages {
 	done
 }
 
-function GetAppVersionFromXML {
+GetAppVersionFromXML () {
 # Returns the current app version from the XML collateral
 	XML="$1"".xml"
 	local APPVER=($(cd $SCRATCH_AREA && grep -A1 -m2 'Update Version' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g'))
@@ -191,7 +191,7 @@ function GetAppVersionFromXML {
 	fi
 }
 
-function GetAppNameFromMAUID {
+GetAppNameFromMAUID () {
 # Performs a reverse look-up from MAUID to friendly name
 	case "$1" in
 		$MAUID_MAU3X)			APPNAME="MAU 3.x"
@@ -216,15 +216,15 @@ function GetAppNameFromMAUID {
 	echo "$APPNAME"
 }
 
-function GetDownloadSize {
-# Gets the size of a file based on it's header, then strips non-numeric characters
+GetDownloadSize () {
+# Gets the size of a file based on its header, then strips non-numeric characters
 	URL="$1"
 	local CONTENTHTTPLENGTH=$(curl --head -s $URL | awk '/Content-Length/' | cut -d ' ' -f2)
 	CONTENTLENGTH=$(echo ${CONTENTHTTPLENGTH//[!0-9]/})
 	echo $CONTENTLENGTH
 }
 
-function GetLocalSize {
+GetLocalSize () {
 # Gets the size of a file from the local disk
 	local FILENAME="$1"
 	# The stat command works differently between macOS and other Linux platforms like RHEL
@@ -236,7 +236,7 @@ function GetLocalSize {
 	echo $FILELENGTH
 }
 
-function DownloadPackage {
+DownloadPackage () {
 # Downloads the specified update package
 	URL="$1"	
 	APPLICATION="$2"
@@ -250,7 +250,7 @@ function DownloadPackage {
 	(cd "$CACHEPATH" && curl --progress-bar --remote-name --location $URL)
 }
 
-function ShowCollateral () {
+ShowCollateral () {
 # Shows collateral information of the downloaded collateral files
 echo "----------------------------------------------------------------------------------------"
 printf '%-14s %-42s %-11s %s\n' \
@@ -293,7 +293,7 @@ echo "--------------------------------------------------------------------------
 exit 0
 }
 
-function CopyCollateral () {
+CopyCollateral () {
 # Copies collateral files from one folder to another.
 	COPYCOLLATERALFROM=$(echo $COPYCOLLATERALFROM | sed 's/[][]//g')
 	COPYCOLLATERALTO=$(echo $COPYCOLLATERALTO | sed 's/[][]//g')
@@ -324,6 +324,10 @@ else
     	;;
     	--HTTPOnly|-h|--httponly)
     	HTTPONLY=true
+    	shift # past argument
+    	;;
+    	--NoPackages|-np|--nopackages)
+    	NOPACKAGES=true
     	shift # past argument
     	;;
     	--NoCollateral|-n|--nocollateral)
@@ -377,7 +381,9 @@ do
 		for a in "${MAUAPP[@]}"
 		do
 			ArchiveCollateralFiles "$a"
-			DownloadUpdatePackages "$a" "$c"
+			if [ ! $NOPACKAGES ]; then
+				DownloadUpdatePackages "$a" "$c"
+			fi
 		done
 	done
 	
