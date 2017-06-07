@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="1.5"
+TOOL_VERSION="1.6"
 
 ## Copyright (c) 2017 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -26,6 +26,8 @@ MAUID_OFFICE2016="0409SUIT15"
 MAUID_LYNC2011="0409UCCP14"
 MAUID_SKYPE2016="0409MSFB16"
 CHANNEL_COLLATERAL_PROD="https://officecdn.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/OfficeMac/"
+CHANNEL_COLLATERAL_INSIDERSLOW="http://officecdn.microsoft.com/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/OfficeMac/"
+CHANNEL_COLLATERAL_INSIDERFAST="http://officecdn.microsoft.com/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/OfficeMac/"
 SCRATCH_AREA="$TMPDIR""MAUCache"
 
 # Platform detection
@@ -35,7 +37,7 @@ ShowUsage () {
 # Shows tool usage and parameters
 	echo $TOOL_NAME - $TOOL_VERSION
 	echo "Purpose: Downloads MAU collateral and packages from the Office CDN to a local web server"
-	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--HTTPOnly] [--NoPackages] [--NoCollateral] [--ShowCollateral] [--CopyCollateralFrom:<from Folder>] [--CopyCollateralTo:<to Folder>]"
+	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--HTTPOnly] [--NoPackages] [--NoCollateral] [--ShowCollateral] [--CopyCollateralFrom:<from Folder>] [--CopyCollateralTo:<to Folder>] [--InsiderSupport]"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CheckInterval:60"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --ShowCollateral"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CopyCollateralFrom:15.27.16101000 --CopyCollateralTo:Production"
@@ -352,6 +354,10 @@ else
     	CopyCollateral
     	shift # past argument
     	;;
+    	--InsiderSupport|-is|--insidersupport)
+    	INSIDER=true
+    	shift # past argument
+    	;;
     	*)
     	ShowUsage
     	;;
@@ -369,6 +375,10 @@ do
 	InitializeCacheArea
 	# Build channel array
 	CHANNELS[0]="$CHANNEL_COLLATERAL_PROD"
+	if [ $INSIDER ]; then
+		CHANNELS[1]="$CHANNEL_COLLATERAL_INSIDERSLOW"
+		CHANNELS[2]="$CHANNEL_COLLATERAL_INSIDERFAST"
+	fi
 	# Routine for all channels in the array
 	for c in "${CHANNELS[@]}"
 	do
