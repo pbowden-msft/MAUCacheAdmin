@@ -80,12 +80,12 @@ If (Test-path -Path $tempFolder)
   New-Item -ItemType Directory -Path "$tempfolder" -Name "Collateral"
   
   
-
+  $starturl = "https://officecdn-microsoft-com.akamaized.net"
 switch ($channel)
 {
-  "Production"{$webUrlDownload = "https://officecdn.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/OfficeMac/"}
-  "External"{$webUrlDownload = "https://officecdn.microsoft.com/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/OfficeMac/"}
-  "InsiderFast"{$webUrlDownload = "https://officecdn.microsoft.com/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/OfficeMac/"}
+  "Production"{$webUrlDownload = "$starturl/pr/C1297A47-86C4-4C1F-97FA-950631F94777/OfficeMac/"}
+  "External"{$webUrlDownload = "$starturl/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/OfficeMac/"}
+  "InsiderFast"{$webUrlDownload = "$starturl/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/OfficeMac/"}
 }
 [io.file]::WriteAllbytes("$collarteralFolder\builds.txt",(Invoke-WebRequest -URI "$webUrlDownload/builds.txt").content) 
 
@@ -107,7 +107,6 @@ $MAUID_POWERPOINT2016="0409PPT315"
 $MAUID_OUTLOOK2016="0409OPIM15"
 $MAUID_ONENOTE2016="0409ONMC15"
 $MAUID_OFFICE2011="0409MSOF14"
-$MAUID_OFFICE2016="0409SUIT15"
 $MAUID_LYNC2011="0409UCCP14"
 $MAUID_SKYPE2016="0409MSFB16"
 
@@ -122,7 +121,6 @@ function BuildApplicationArray() {
   $MAUAPP+="$MAUID_OUTLOOK2016"
   $MAUAPP+="$MAUID_ONENOTE2016"
   $MAUAPP+="$MAUID_OFFICE2011"
-  $MAUAPP+="$MAUID_OFFICE2016"
   $MAUAPP+="$MAUID_LYNC2011"
   $MAUAPP+="$MAUID_SKYPE2016"
   return $MAUAPP
