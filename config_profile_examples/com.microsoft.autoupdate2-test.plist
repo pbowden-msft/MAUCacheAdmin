@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AppExitGraceful</key>
+	<true/>
+	<key>Applications</key>
+	<dict>
+		<key>/Applications/Microsoft Excel.app</key>
+		<dict>
+			<key>Application ID</key>
+			<string>XCEL15</string>
+			<key>LCID</key>
+			<string>1033</string>
+		</dict>
+		<key>/Applications/Microsoft Outlook.app</key>
+		<dict>
+			<key>Application ID</key>
+			<string>OPIM15</string>
+			<key>LCID</key>
+			<string>1033</string>
+		</dict>
+		<key>/Applications/Microsoft PowerPoint.app</key>
+		<dict>
+			<key>Application ID</key>
+			<string>PPT315</string>
+			<key>LCID</key>
+			<string>1033</string>
+		</dict>
+		<key>/Applications/Microsoft Word.app</key>
+		<dict>
+			<key>Application ID</key>
+			<string>MSWD15</string>
+			<key>LCID</key>
+			<string>1033</string>
+		</dict>
+		<key>/Applications/Skype for Business.app</key>
+		<dict>
+			<key>Application ID</key>
+			<string>MSFB16</string>
+			<key>LCID</key>
+			<string>1033</string>
+		</dict>
+		<key>/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app</key>
+		<dict>
+			<key>Application ID</key>
+			<string>MSau03</string>
+			<key>LCID</key>
+			<integer>1033</integer>
+		</dict>
+		<key>/Library/Internet Plug-Ins/Silverlight.plugin</key>
+		<dict>
+			<key>Application ID</key>
+			<string>SLVT</string>
+			<key>LCID</key>
+			<integer>1033</integer>
+		</dict>
+	</dict>
+	<key>ChannelName</key>
+	<string>Custom</string>
+	<key>DisableInsiderCheckbox</key>
+	<true/>
+	<key>HowToCheck</key>
+	<string>AutomaticDownload</string>
+	<key>LastUpdate</key>
+	<date>2017-08-11T20:14:43Z</date>
+	<key>ManifestServer</key>
+	<string>http://manifest-server-url/MAU/cache/collateral/Production/</string>
+	<key>OSLocale</key>
+	<string>en_US</string>
+	<key>SendAllTelemetryEnabled</key>
+	<false/>
+	<key>SendCrashReportsEvenWithTelemetryDisabled</key>
+	<false/>
+	<key>StartDaemonOnAppLaunch</key>
+	<true/>
+	<key>UpdateCache</key>
+	<string>http://cache-server-url/MAU/cache/</string>
+</dict>
+</plist>

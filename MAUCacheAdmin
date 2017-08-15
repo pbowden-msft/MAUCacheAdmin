@@ -6,10 +6,10 @@ TOOL_VERSION="1.7"
 
 ## Copyright (c) 2017 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
-## Microsoft disclaims all implied warranties including, without limitation, any implied warranties of merchantability or of fitness for a 
+## Microsoft disclaims all implied warranties including, without limitation, any implied warranties of merchantability or of fitness for a
 ## particular purpose. The entire risk arising out of the use or performance of the scripts and documentation remains with you. In no event shall
-## Microsoft, its authors, or anyone else involved in the creation, production, or delivery of the scripts be liable for any damages whatsoever 
-## (including, without limitation, damages for loss of business profits, business interruption, loss of business information, or other pecuniary 
+## Microsoft, its authors, or anyone else involved in the creation, production, or delivery of the scripts be liable for any damages whatsoever
+## (including, without limitation, damages for loss of business profits, business interruption, loss of business information, or other pecuniary
 ## loss) arising out of the use of or inability to use the sample scripts or documentation, even if Microsoft has been advised of the possibility
 ## of such damages.
 ## Feedback: pbowden@microsoft.com
@@ -29,6 +29,9 @@ CHANNEL_COLLATERAL_PROD="https://officecdn.microsoft.com/pr/C1297A47-86C4-4C1F-9
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdn.microsoft.com/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/OfficeMac/"
 CHANNEL_COLLATERAL_INSIDERFAST="https://officecdn.microsoft.com/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/OfficeMac/"
 SCRATCH_AREA="$TMPDIR""MAUCache"
+HIPCHAT_NOTIFY_ADDRESS="https://api.hipchat.com/v1/rooms/"
+HIPCHAT_AUTH_TOKEN="<PUT HIPCHAT AUTHTOKEN HERE>"
+HIPCHAT_ROOM_ID="<PUT HIPCHAT ROOM ID HERE>"
 
 # Platform detection
 PLATFORM=$(uname -s)
@@ -242,13 +245,19 @@ GetLocalSize () {
 	fi
 	echo $FILELENGTH
 }
+HipChatNotify () {
+	# Send Alert to HipChat Room Specified in Global Variable when Package is Downloaded
+	echo "New Package Detected: $PACKAGE"
+	curl -v -k -d "room_id=${HIPCHAT_ROOM_ID}&from=ServerAlert&message=""<b>MAU Server Alert</b> - New Package Downloaded:<b> ${PACKAGE}</b>""&color=purple" ${HIPCHAT_NOTIFY_ADDRESS}/message?auth_token=${HIPCHAT_AUTH_TOKEN}&format=json
+}
 
 DownloadPackage () {
 # Downloads the specified update package
-	URL="$1"	
+	URL="$1"
 	APPLICATION="$2"
 	SIZE="$3"
 	PACKAGE=$(basename "$1")
+	HipChatNotify
 	echo "==================================================="
 	echo Application: "$APPLICATION"
 	echo Package:     "$PACKAGE"
@@ -268,7 +277,7 @@ for d in "$CACHEPATH/collateral/"*;
 do
   cd "$d/";
   if ls *.xml >/dev/null 2>&1; then
-	  for XML in *.xml; 
+	  for XML in *.xml;
 	  do
 	  Folder=$(echo "$d" | awk -F "/" '{print $NF}')
 	  if [ "$Folder" = "Legacy" ]; then
@@ -276,7 +285,7 @@ do
 			ver=""
 			BuildDate=$(grep -A1 'Date' "$XML" | grep 'date' | sed -e 's,.*<date>\([^<]*\)</date>.*,\1,g' | tail -1 | cut -d"T" -f1)
 			AppTitle=$(grep -A1 'Title' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g' | tail -1)
-			
+
 			printf '%-14s %-42s %-11s %s\n' \
 			"$AppIdentifier" "$AppTitle" "$BuildDate" "[$Folder]"
 	  else
@@ -284,14 +293,14 @@ do
 			ver=$(grep -A1 -m2 'Update Version' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g')
 			BuildDate=$(grep -A1 'Date' "$XML" | grep 'date' | sed -e 's,.*<date>\([^<]*\)</date>.*,\1,g' | tail -1 | cut -d"T" -f1)
 			AppTitle=$(grep -A1 'Title' "$XML" | grep 'string' | sed -e 's,.*<string>\([^<]*\)</string>.*,\1,g' | tail -1)
-					
+
 			printf '%-14s %-42s %-11s %s\n' \
 			"$AppIdentifier" "$AppTitle" "$BuildDate" "[$Folder]"
 	  fi
 	  done
 	else
 		Folder=$(echo "$d" | awk -F "/" '{print $NF}')
-		
+
 		printf '%-14s %-42s %-11s %s\n' \
         "" "" "" "[$Folder]"
 	fi
@@ -401,7 +410,7 @@ do
 			fi
 		done
 	done
-	
+
 	# If CheckInterval wasn't specified on the command-line, just run once
 	if [ "$CHECKINTERVAL" == '' ]; then
 		exit 0
