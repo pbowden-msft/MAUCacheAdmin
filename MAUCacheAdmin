@@ -29,6 +29,9 @@ CHANNEL_COLLATERAL_PROD="https://officecdn.microsoft.com/pr/C1297A47-86C4-4C1F-9
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdn.microsoft.com/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/OfficeMac/"
 CHANNEL_COLLATERAL_INSIDERFAST="https://officecdn.microsoft.com/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/OfficeMac/"
 SCRATCH_AREA="$TMPDIR""MAUCache"
+
+# Variables for HipChat Notifications
+HIPCHAT_NOTIFY=false
 HIPCHAT_NOTIFY_ADDRESS="https://api.hipchat.com/v1/rooms/"
 HIPCHAT_AUTH_TOKEN="<PUT HIPCHAT AUTHTOKEN HERE>"
 HIPCHAT_ROOM_ID="<PUT HIPCHAT ROOM ID HERE>"
@@ -247,8 +250,10 @@ GetLocalSize () {
 }
 HipChatNotify () {
 	# Send Alert to HipChat Room Specified in Global Variable when Package is Downloaded
-	echo "New Package Detected: $PACKAGE"
-	curl -v -k -d "room_id=${HIPCHAT_ROOM_ID}&from=ServerAlert&message=""<b>MAU Server Alert</b> - New Package Downloaded:<b> ${PACKAGE}</b>""&color=purple" ${HIPCHAT_NOTIFY_ADDRESS}/message?auth_token=${HIPCHAT_AUTH_TOKEN}&format=json
+	if [ $HIPCHAT_NOTIFY == true ]; then
+		echo "New Package Detected: $PACKAGE"
+		curl -v -k -d "room_id=${HIPCHAT_ROOM_ID}&from=ServerAlert&message=""<b>MAU Server Alert</b> - New Package Downloaded:<b> ${PACKAGE}</b>""&color=purple" ${HIPCHAT_NOTIFY_ADDRESS}/message?auth_token=${HIPCHAT_AUTH_TOKEN}&format=json
+	fi
 }
 
 DownloadPackage () {
