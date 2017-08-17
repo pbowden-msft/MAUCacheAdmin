@@ -62,8 +62,6 @@
 	<true/>
 	<key>HowToCheck</key>
 	<string>AutomaticDownload</string>
-	<key>LastUpdate</key>
-	<date>2017-08-11T20:14:43Z</date>
 	<key>ManifestServer</key>
 	<string>http://manifest-server-url/MAU/cache/collateral/Production/</string>
 	<key>OSLocale</key>
