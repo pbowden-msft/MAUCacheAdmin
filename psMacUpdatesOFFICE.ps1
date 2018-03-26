@@ -109,7 +109,8 @@ $MAUID_ONENOTE2016="0409ONMC15"
 $MAUID_OFFICE2011="0409MSOF14"
 $MAUID_LYNC2011="0409UCCP14"
 $MAUID_SKYPE2016="0409MSFB16"
-
+$MAUID_INTUNECP="0409IMCP01"
+$MAUID_REMOTEDESKTOP10="0409MSRD10"
 
 function BuildApplicationArray() {
   # Builds an array of all the MAU-enabled applications that we care about
@@ -123,6 +124,8 @@ function BuildApplicationArray() {
   $MAUAPP+="$MAUID_OFFICE2011"
   $MAUAPP+="$MAUID_LYNC2011"
   $MAUAPP+="$MAUID_SKYPE2016"
+  $MAUAPP+="$MAUID_INTUNECP"
+  $MAUAPP+="$MAUID_REMOTEDESKTOP10"
   return $MAUAPP
 }
 function DownloadUPdate ([Parameter(Mandatory=$true)]$Payload, [Parameter(Mandatory=$true)]$location)
