@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="1.9"
+TOOL_VERSION="2.0"
 
 ## Copyright (c) 2018 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -16,6 +16,11 @@ TOOL_VERSION="1.9"
 
 # Constants
 MAUID_MAU3X="0409MSau03"
+MAUID_WORD2019="0409MSWD2019"
+MAUID_EXCEL2019="0409XCEL2019"
+MAUID_POWERPOINT2019="0409PPT32019"
+MAUID_OUTLOOK2019="0409OPIM2019"
+MAUID_ONENOTE2019="0409ONMC2019"
 MAUID_WORD2016="0409MSWD15"
 MAUID_EXCEL2016="0409XCEL15"
 MAUID_POWERPOINT2016="0409PPT315"
@@ -74,7 +79,7 @@ ResolveDownloadUrl () {
 # Selects either HTTPS from the Office CDN origin, or HTTP directly from Akamai
 	if [ "$HTTPONLY" ]; then
 		HTTPURL=(${1/https/http})
-		FILEURL=(${HTTPURL/officecdn.microsoft.com/officecdn.microsoft.com.edgesuite.net})
+		FILEURL=(${HTTPURL/officecdn.microsoft.com/officecdn-microsoft-com.akamaized.net})
 	else
 		FILEURL="$1"
 	fi
@@ -84,31 +89,41 @@ ResolveDownloadUrl () {
 BuildApplicationArray () {
 # Builds an array of all the MAU-enabled applications that we care about
 	MAUAPP[0]="$MAUID_MAU3X"
-	MAUAPP[1]="$MAUID_WORD2016"
-	MAUAPP[2]="$MAUID_EXCEL2016"
-	MAUAPP[3]="$MAUID_POWERPOINT2016"
-	MAUAPP[4]="$MAUID_OUTLOOK2016"
-	MAUAPP[5]="$MAUID_ONENOTE2016"
-	MAUAPP[6]="$MAUID_OFFICE2011"
-	MAUAPP[7]="$MAUID_LYNC2011"
-	MAUAPP[8]="$MAUID_SKYPE2016"
-	MAUAPP[9]="$MAUID_INTUNECP"
-	MAUAPP[10]="$MAUID_REMOTEDESKTOP10"
+	MAUAPP[1]="$MAUID_WORD2019"
+	MAUAPP[2]="$MAUID_EXCEL2019"
+	MAUAPP[3]="$MAUID_POWERPOINT2019"
+	MAUAPP[4]="$MAUID_OUTLOOK2019"
+	MAUAPP[5]="$MAUID_ONENOTE2019"
+	MAUAPP[6]="$MAUID_WORD2016"
+	MAUAPP[7]="$MAUID_EXCEL2016"
+	MAUAPP[8]="$MAUID_POWERPOINT2016"
+	MAUAPP[9]="$MAUID_OUTLOOK2016"
+	MAUAPP[10]="$MAUID_ONENOTE2016"
+	MAUAPP[11]="$MAUID_OFFICE2011"
+	MAUAPP[12]="$MAUID_LYNC2011"
+	MAUAPP[13]="$MAUID_SKYPE2016"
+	MAUAPP[14]="$MAUID_INTUNECP"
+	MAUAPP[15]="$MAUID_REMOTEDESKTOP10"
 }
 
 BuildCollateralArray () {
 # Builds an array of MAU collateral file-paths which we'll use later for downloading XML and CAT files
 	DOWNLOADARRAY[0]="$1"$MAUID_MAU3X
-	DOWNLOADARRAY[1]="$1"$MAUID_WORD2016
-	DOWNLOADARRAY[2]="$1"$MAUID_EXCEL2016
-	DOWNLOADARRAY[3]="$1"$MAUID_POWERPOINT2016
-	DOWNLOADARRAY[4]="$1"$MAUID_OUTLOOK2016
-	DOWNLOADARRAY[5]="$1"$MAUID_ONENOTE2016
-	DOWNLOADARRAY[6]="$1"$MAUID_OFFICE2011
-	DOWNLOADARRAY[7]="$1"$MAUID_LYNC2011
-	DOWNLOADARRAY[8]="$1"$MAUID_SKYPE2016
-	DOWNLOADARRAY[9]="$1"$MAUID_INTUNECP
-	DOWNLOADARRAY[10]="$1"$MAUID_REMOTEDESKTOP10
+	DOWNLOADARRAY[1]="$1"$MAUID_WORD2019
+	DOWNLOADARRAY[2]="$1"$MAUID_EXCEL2019
+	DOWNLOADARRAY[3]="$1"$MAUID_POWERPOINT2019
+	DOWNLOADARRAY[4]="$1"$MAUID_OUTLOOK2019
+	DOWNLOADARRAY[5]="$1"$MAUID_ONENOTE2019
+	DOWNLOADARRAY[6]="$1"$MAUID_WORD2016
+	DOWNLOADARRAY[7]="$1"$MAUID_EXCEL2016
+	DOWNLOADARRAY[8]="$1"$MAUID_POWERPOINT2016
+	DOWNLOADARRAY[9]="$1"$MAUID_OUTLOOK2016
+	DOWNLOADARRAY[10]="$1"$MAUID_ONENOTE2016
+	DOWNLOADARRAY[11]="$1"$MAUID_OFFICE2011
+	DOWNLOADARRAY[12]="$1"$MAUID_LYNC2011
+	DOWNLOADARRAY[13]="$1"$MAUID_SKYPE2016
+	DOWNLOADARRAY[14]="$1"$MAUID_INTUNECP
+	DOWNLOADARRAY[15]="$1"$MAUID_REMOTEDESKTOP10
 }
 
 DownloadCollateralFiles () {
@@ -210,6 +225,16 @@ GetAppNameFromMAUID () {
 	case "$1" in
 		$MAUID_MAU3X)			APPNAME="MAU 3.x"
 								;;
+		$MAUID_WORD2019)		APPNAME="Word 2019"
+								;;
+		$MAUID_EXCEL2019)		APPNAME="Excel 2019"
+								;;
+		$MAUID_POWERPOINT2019)	APPNAME="PowerPoint 2019"
+								;;
+		$MAUID_OUTLOOK2019)		APPNAME="Outlook 2019"
+								;;
+		$MAUID_ONENOTE2019)		APPNAME="OneNote 2019"
+								;;
 		$MAUID_WORD2016)		APPNAME="Word 2016"
 								;;
 		$MAUID_EXCEL2016)		APPNAME="Excel 2016"
@@ -221,8 +246,6 @@ GetAppNameFromMAUID () {
 		$MAUID_ONENOTE2016)		APPNAME="OneNote 2016"
 								;;
 		$MAUID_OFFICE2011)		APPNAME="Office 2011"
-								;;
-		$MAUID_OFFICE2016)		APPNAME="Office 2016"
 								;;
 		$MAUID_LYNC2011)		APPNAME="Lync 2011"
 								;;
@@ -255,8 +278,9 @@ GetLocalSize () {
 	fi
 	echo $FILELENGTH
 }
+
 HipChatNotify () {
-	# Send Alert to HipChat Room Specified in Global Variable when Package is Downloaded
+# Send Alert to HipChat Room Specified in Global Variable when Package is Downloaded
 	if [ $HIPCHAT_NOTIFY == true ]; then
 		echo "New Package Detected: $PACKAGE"
 		curl -v -k -d "room_id=${HIPCHAT_ROOM_ID}&from=ServerAlert&message=""<b>MAU Server Alert</b> - New Package Downloaded:<b> ${PACKAGE}</b>""&color=purple" ${HIPCHAT_NOTIFY_ADDRESS}/message?auth_token=${HIPCHAT_AUTH_TOKEN}&format=json
