@@ -83,9 +83,9 @@ If (Test-path -Path $tempFolder)
   $starturl = "https://officecdn-microsoft-com.akamaized.net"
 switch ($channel)
 {
-  "Production"{$webUrlDownload = "$starturl/pr/C1297A47-86C4-4C1F-97FA-950631F94777/OfficeMac/"}
-  "External"{$webUrlDownload = "$starturl/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/OfficeMac/"}
-  "InsiderFast"{$webUrlDownload = "$starturl/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/OfficeMac/"}
+  "Production"{$webUrlDownload = "$starturl/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/"}
+  "External"{$webUrlDownload = "$starturl/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/MacAutoupdate/"}
+  "InsiderFast"{$webUrlDownload = "$starturl/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/MacAutoupdate/"}
 }
 [io.file]::WriteAllbytes("$collarteralFolder\builds.txt",(Invoke-WebRequest -URI "$webUrlDownload/builds.txt").content) 
 
