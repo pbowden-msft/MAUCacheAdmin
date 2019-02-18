@@ -2,9 +2,9 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="2.1"
+TOOL_VERSION="2.2"
 
-## Copyright (c) 2018 Microsoft Corp. All rights reserved.
+## Copyright (c) 2019 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
 ## Microsoft disclaims all implied warranties including, without limitation, any implied warranties of merchantability or of fitness for a
 ## particular purpose. The entire risk arising out of the use or performance of the scripts and documentation remains with you. In no event shall
@@ -41,6 +41,11 @@ HIPCHAT_NOTIFY=false
 HIPCHAT_NOTIFY_ADDRESS="https://api.hipchat.com/v1/rooms/"
 HIPCHAT_AUTH_TOKEN="<PUT HIPCHAT AUTHTOKEN HERE>"
 HIPCHAT_ROOM_ID="<PUT HIPCHAT ROOM ID HERE>"
+
+# Variables for Slack Notifications
+SLACK_NOTIFY=false
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/<COMPLETE URL HERE>"
+SLACK_ICON_URL="https://macadmins.software/icons/mau4.png"
 
 # Platform detection
 PLATFORM=$(uname -s)
@@ -287,6 +292,14 @@ HipChatNotify () {
 	fi
 }
 
+SlackNotify () {
+# Send Alert to Slack Webhook in Global Variable when Package is Downloaded
+	if [ $SLACK_NOTIFY == true ]; then
+		echo "New Package Detected: $PACKAGE"
+		curl -X POST -H 'Content-type: application/json' --data '{"username":"MAUCacheAdmin","icon_url":"'"$SLACK_ICON_URL"'","text":"New Package Downloaded: '"$PACKAGE"'"}' $SLACK_WEBHOOK_URL
+	fi
+}
+
 DownloadPackage () {
 # Downloads the specified update package
 	URL="$1"
@@ -294,6 +307,7 @@ DownloadPackage () {
 	SIZE="$3"
 	PACKAGE=$(basename "$1")
 	HipChatNotify
+	SlackNotify
 	echo "==================================================="
 	echo Application: "$APPLICATION"
 	echo Package:     "$PACKAGE"
