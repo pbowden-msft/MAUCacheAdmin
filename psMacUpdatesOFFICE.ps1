@@ -4,13 +4,13 @@
     .DESCRIPTION
     Authors - Adam Martin, David Coupe
     Based on Bash script by pbowden@microsoft.com
-    Needs to run as administator to allow file rights
-    Creates directory structure for iis 
-    Downloads updates to tempory structure
-    Delets original files from iis
+    Needs to run as administrator to allow file rights
+    Creates directory structure for IIS 
+    Downloads updates to temporary structure
+    Deletes original files from IIS
     moves new downloads to IIS structure
     .PARAMETER Channel
-    Must supply channel. Values accaptable are "Production", "External", "InsiderFast"
+    Must supply channel. Values acceptable are "Production", "External", "InsiderFast"
     .PARAMETER IISRoot
     Must supply iisBase. The path to default IIS eg C:\inetpub\wwwroot
     .PARAMETER IisFolder
@@ -24,7 +24,7 @@
  #>
  [cmdletbinding()]
   Param(
-  [Parameter(Mandatory=$true,HelpMessage='Must supply channel. Values accaptable are "Production", "External", "InsiderFast"')]
+  [Parameter(Mandatory=$true,HelpMessage='Must supply channel. Values acceptable are "Production", "External", "InsiderFast"')]
   [ValidateSet("Production", "External", "InsiderFast")]
   [string]
   $channel,
@@ -90,7 +90,7 @@ switch ($channel)
 [io.file]::WriteAllbytes("$collarteralFolder\builds.txt",(Invoke-WebRequest -URI "$webUrlDownload/builds.txt").content) 
 
 #compare temp build.txt with prod build.txt
-#Initalise $origcontent array incase of first run
+#Initalise $origcontent array in case of first run
 #if change detected then continue else stop
 $origContent = @("")
 if (test-path "$PublishFolder\builds.txt"){$origContent = Get-Content "$PublishFolder\builds.txt"}
@@ -243,7 +243,7 @@ $mauApp = BuildApplicationArray
 DownloadCollateralFiles -downloadarray $mauApp -weburldown $webUrlDownload
 
 #rename Folders
-#Sainity check of folder before renaming
+#Sanity check of folder before renaming
 if ((Get-ChildItem $tempfolder).count -ge 10){
 
   Remove-Item $PublishFolder -recurse -Force
