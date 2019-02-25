@@ -136,7 +136,7 @@ DownloadCollateralFiles () {
 	for i in "$@"
 	do
 		echo Downloading collateral file: "$i"
-		(cd "$SCRATCH_AREA" && curl --progress-bar --remote-name --location "$i.{xml,cat}")
+		(cd "$SCRATCH_AREA" && curl --progress-bar --remote-name --location "$i.{xml,cat}" && curl --progress-bar --remote-name --location "$i-chk.xml")
 	done
 }
 
