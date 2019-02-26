@@ -1,4 +1,4 @@
-﻿<#
+<#
     .Synopsis
     Download MAU update for mac
     .DESCRIPTION
@@ -101,6 +101,7 @@ If ((compare-object $origContent $newContent).count -eq 0){
 }
 
 $MAUID_MAU3X="0409MSAU03"
+$MAUID_MAU4X="0409MSAU04"
 $MAUID_WORD2019="0409MSWD2019"
 $MAUID_EXCEL2019="0409XCEL2019"
 $MAUID_POWERPOINT2019="0409PPT32019"
@@ -121,6 +122,7 @@ function BuildApplicationArray() {
   # Builds an array of all the MAU-enabled applications that we care about
   $MAUAPP=@()
   $MAUAPP+="$MAUID_MAU3X"
+  $MAUAPP+="$MAUID_MAU4X"
   $MAUAPP+="$MAUID_WORD2019"
   $MAUAPP+="$MAUID_EXCEL2019"
   $MAUAPP+="$MAUID_POWERPOINT2019"
@@ -162,6 +164,7 @@ function DownloadCollateralFiles ([Parameter(Mandatory=$true)]$downloadarray,[Pa
     $UpdateVersions = ""
     Write-Verbose "$down"
     [io.file]::WriteAllbytes("$collarteralFolder\$down.xml",(Invoke-WebRequest -URI "$weburldown$down.xml").content) 
+    [io.file]::WriteAllbytes("$collarteralFolder\$down-chk.xml",(Invoke-WebRequest -URI "$weburldown$down-chk.xml").content)
     [io.file]::WriteAllbytes("$collarteralFolder\$down.cat",(Invoke-WebRequest -URI "$weburldown$down.cat").content) 
     
    
@@ -196,6 +199,7 @@ function DownloadCollateralFiles ([Parameter(Mandatory=$true)]$downloadarray,[Pa
           }
       write-verbose "$collateral\$pathtoput\$down.xml"    
       Copy-Item -Path "$collarteralFolder\$down.xml"    -Destination "$collateral\$pathtoput\$down.xml" -Verbose
+      Copy-Item -Path "$collarteralFolder\$down-chk.xml"    -Destination "$collateral\$pathtoput\$down-chk.xml" -Verbose
       Copy-Item -Path "$collarteralFolder\$down.cat"    -Destination "$collateral\$pathtoput\$down.cat" -Verbose
       
     
