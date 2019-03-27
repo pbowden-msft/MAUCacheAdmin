@@ -63,7 +63,7 @@
 	<key>HowToCheck</key>
 	<string>AutomaticDownload</string>
 	<key>ManifestServer</key>
-	<string>http://manifest-server-url/MAU/cache/collateral/Production/</string>
+	<string>http://manifest-server-url/MAU/cache/collateral/Testing/</string>
 	<key>OSLocale</key>
 	<string>en_US</string>
 	<key>SendAllTelemetryEnabled</key>
