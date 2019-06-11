@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="2.4"
+TOOL_VERSION="2.5"
 
 ## Copyright (c) 2019 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -27,11 +27,10 @@ MAUID_EXCEL2016="0409XCEL15"
 MAUID_POWERPOINT2016="0409PPT315"
 MAUID_OUTLOOK2016="0409OPIM15"
 MAUID_ONENOTE2016="0409ONMC15"
-MAUID_OFFICE2011="0409MSOF14"
-MAUID_LYNC2011="0409UCCP14"
 MAUID_SKYPE2016="0409MSFB16"
 MAUID_INTUNECP="0409IMCP01"
 MAUID_REMOTEDESKTOP10="0409MSRD10"
+MAUID_ONEDRIVE="0409ONDR18"
 CHANNEL_COLLATERAL_PROD="https://officecdn-microsoft-com.akamaized.net/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdn-microsoft-com.akamaized.net/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERFAST="https://officecdn-microsoft-com.akamaized.net/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/MacAutoupdate/"
@@ -106,11 +105,10 @@ BuildApplicationArray () {
 	MAUAPP[9]="$MAUID_POWERPOINT2016"
 	MAUAPP[10]="$MAUID_OUTLOOK2016"
 	MAUAPP[11]="$MAUID_ONENOTE2016"
-	MAUAPP[12]="$MAUID_OFFICE2011"
-	MAUAPP[13]="$MAUID_LYNC2011"
-	MAUAPP[14]="$MAUID_SKYPE2016"
-	MAUAPP[15]="$MAUID_INTUNECP"
-	MAUAPP[16]="$MAUID_REMOTEDESKTOP10"
+	MAUAPP[12]="$MAUID_SKYPE2016"
+	MAUAPP[13]="$MAUID_INTUNECP"
+	MAUAPP[14]="$MAUID_REMOTEDESKTOP10"
+	MAUAPP[15]="$MAUID_ONEDRIVE"
 }
 
 BuildCollateralArray () {
@@ -127,11 +125,10 @@ BuildCollateralArray () {
 	DOWNLOADARRAY[9]="$1"$MAUID_POWERPOINT2016
 	DOWNLOADARRAY[10]="$1"$MAUID_OUTLOOK2016
 	DOWNLOADARRAY[11]="$1"$MAUID_ONENOTE2016
-	DOWNLOADARRAY[12]="$1"$MAUID_OFFICE2011
-	DOWNLOADARRAY[13]="$1"$MAUID_LYNC2011
-	DOWNLOADARRAY[14]="$1"$MAUID_SKYPE2016
-	DOWNLOADARRAY[15]="$1"$MAUID_INTUNECP
-	DOWNLOADARRAY[16]="$1"$MAUID_REMOTEDESKTOP10
+	DOWNLOADARRAY[12]="$1"$MAUID_SKYPE2016
+	DOWNLOADARRAY[13]="$1"$MAUID_INTUNECP
+	DOWNLOADARRAY[14]="$1"$MAUID_REMOTEDESKTOP10
+	DOWNLOADARRAY[15]="$1"$MAUID_ONEDRIVE
 }
 
 DownloadCollateralFiles () {
@@ -256,15 +253,13 @@ GetAppNameFromMAUID () {
 								;;
 		$MAUID_ONENOTE2016)		APPNAME="OneNote 2016"
 								;;
-		$MAUID_OFFICE2011)		APPNAME="Office 2011"
-								;;
-		$MAUID_LYNC2011)		APPNAME="Lync 2011"
-								;;
 		$MAUID_SKYPE2016)		APPNAME="Skype for Business 2016"
 								;;
 		$MAUID_INTUNECP)		APPNAME="Intune Company Portal"
 								;;
 		$MAUID_REMOTEDESKTOP10)		APPNAME="Remote Desktop v10"
+								;;
+		$MAUID_ONEDRIVE)		APPNAME="OneDrive"
 								;;
 	esac
 	echo "$APPNAME"
@@ -283,7 +278,7 @@ GetLocalSize () {
 	local FILENAME="$1"
 	# The stat command works differently between macOS and other Linux platforms like RHEL
 	if [ "$PLATFORM" == "Darwin" ]; then
-		local FILELENGTH=($(cd "$CACHEPATH" && stat -f%z "$FILENAME"))
+		local FILELENGTH=($(cd "$CACHEPATH" && stat -qf%z "$FILENAME"))
 	else
 		local FILELENGTH=($(cd "$CACHEPATH" && stat -c%s "$FILENAME"))
 	fi
