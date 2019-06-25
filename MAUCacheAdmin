@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="2.5"
+TOOL_VERSION="2.6"
 
 ## Copyright (c) 2019 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -46,6 +46,10 @@ HIPCHAT_ROOM_ID="<PUT HIPCHAT ROOM ID HERE>"
 SLACK_NOTIFY=false
 SLACK_WEBHOOK_URL="https://hooks.slack.com/services/<COMPLETE URL HERE>"
 SLACK_ICON_URL="https://macadmins.software/icons/mau4.png"
+
+# Variables for Microsoft Teams Notifications
+TEAMS_NOTIFY=false
+TEAMS_WEBHOOK_URL="https://outlook.office.com/webhook/<COMPLETE URL HERE>"
 
 # Platform detection
 PLATFORM=$(uname -s)
@@ -301,6 +305,14 @@ SlackNotify () {
 	fi
 }
 
+TeamsNotify () {
+# Send Alert to Teams Webhook in Global Variable when Package is Downloaded
+	if [ $TEAMS_NOTIFY == true ]; then
+		echo "New Package Detected: $PACKAGE"
+		curl -H 'Content-type: application/json' -d '{"text":"New Package Downloaded: '"$PACKAGE"'"}' $TEAMS_WEBHOOK_URL
+	fi
+}
+
 DownloadPackage () {
 # Downloads the specified update package
 	URL="$1"
@@ -309,6 +321,7 @@ DownloadPackage () {
 	PACKAGE=$(basename "$1")
 	HipChatNotify
 	SlackNotify
+	TeamsNotify
 	echo "==================================================="
 	echo Application: "$APPLICATION"
 	echo Package:     "$PACKAGE"
