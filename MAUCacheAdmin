@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="2.6"
+TOOL_VERSION="2.7"
 
 ## Copyright (c) 2019 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -31,6 +31,7 @@ MAUID_SKYPE2016="0409MSFB16"
 MAUID_INTUNECP="0409IMCP01"
 MAUID_REMOTEDESKTOP10="0409MSRD10"
 MAUID_ONEDRIVE="0409ONDR18"
+MAUID_DEFENDER="0409WDAV00"
 CHANNEL_COLLATERAL_PROD="https://officecdn-microsoft-com.akamaized.net/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdn-microsoft-com.akamaized.net/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERFAST="https://officecdn-microsoft-com.akamaized.net/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/MacAutoupdate/"
@@ -113,6 +114,7 @@ BuildApplicationArray () {
 	MAUAPP[13]="$MAUID_INTUNECP"
 	MAUAPP[14]="$MAUID_REMOTEDESKTOP10"
 	MAUAPP[15]="$MAUID_ONEDRIVE"
+	MAUAPP[16]="$MAUID_DEFENDER"
 }
 
 BuildCollateralArray () {
@@ -133,6 +135,7 @@ BuildCollateralArray () {
 	DOWNLOADARRAY[13]="$1"$MAUID_INTUNECP
 	DOWNLOADARRAY[14]="$1"$MAUID_REMOTEDESKTOP10
 	DOWNLOADARRAY[15]="$1"$MAUID_ONEDRIVE
+	DOWNLOADARRAY[16]="$1"$MAUID_DEFENDER
 }
 
 DownloadCollateralFiles () {
@@ -264,6 +267,8 @@ GetAppNameFromMAUID () {
 		$MAUID_REMOTEDESKTOP10)		APPNAME="Remote Desktop v10"
 								;;
 		$MAUID_ONEDRIVE)		APPNAME="OneDrive"
+								;;
+		$MAUID_DEFENDER)		APPNAME="Defender ATP"
 								;;
 	esac
 	echo "$APPNAME"
