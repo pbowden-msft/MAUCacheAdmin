@@ -38,19 +38,19 @@ CHANNEL_COLLATERAL_INSIDERFAST="https://officecdn-microsoft-com.akamaized.net/pr
 SCRATCH_AREA="$TMPDIR""MAUCache"
 
 # Variables for HipChat Notifications
-HIPCHAT_NOTIFY=false
-HIPCHAT_NOTIFY_ADDRESS="https://api.hipchat.com/v1/rooms/"
-HIPCHAT_AUTH_TOKEN="<PUT HIPCHAT AUTHTOKEN HERE>"
-HIPCHAT_ROOM_ID="<PUT HIPCHAT ROOM ID HERE>"
+: "${HIPCHAT_NOTIFY:=false}"
+: "${HIPCHAT_NOTIFY_ADDRESS:=<PUT HIPCHAT ROOM ID HERE>}"
+: "${HIPCHAT_AUTH_TOKEN:=<PUT HIPCHAT AUTHTOKEN HERE>}"
+: "${HIPCHAT_ROOM_ID:=<PUT HIPCHAT ROOM ID HERE>}"
 
 # Variables for Slack Notifications
-SLACK_NOTIFY=false
-SLACK_WEBHOOK_URL="https://hooks.slack.com/services/<COMPLETE URL HERE>"
-SLACK_ICON_URL="https://macadmins.software/icons/mau4.png"
+: "${SLACK_NOTIFY:=false}"
+: "${SLACK_WEBHOOK_URL:=https://hooks.slack.com/services/<COMPLETE URL HERE>}"
+: "${SLACK_ICON_URL:=https://macadmins.software/icons/mau4.png}"
 
 # Variables for Microsoft Teams Notifications
-TEAMS_NOTIFY=false
-TEAMS_WEBHOOK_URL="https://outlook.office.com/webhook/<COMPLETE URL HERE>"
+: "${TEAMS_NOTIFY:=false}"
+: "${TEAMS_WEBHOOK_URL:=https://outlook.office.com/webhook/<COMPLETE URL HERE>}"
 
 # Platform detection
 PLATFORM=$(uname -s)
