@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="2.8"
+TOOL_VERSION="2.9"
 
 ## Copyright (c) 2020 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -33,6 +33,7 @@ MAUID_REMOTEDESKTOP10="0409MSRD10"
 MAUID_ONEDRIVE="0409ONDR18"
 MAUID_DEFENDER="0409WDAV00"
 MAUID_EDGE="0409EDGE01"
+MAUID_TEAMS="0409TEAM01"
 CHANNEL_COLLATERAL_PROD="https://officecdn-microsoft-com.akamaized.net/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdn-microsoft-com.akamaized.net/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERFAST="https://officecdn-microsoft-com.akamaized.net/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/MacAutoupdate/"
@@ -117,6 +118,7 @@ BuildApplicationArray () {
 	MAUAPP[15]="$MAUID_ONEDRIVE"
 	MAUAPP[16]="$MAUID_DEFENDER"
 	MAUAPP[17]="$MAUID_EDGE"
+	MAUAPP[18]="$MAUID_TEAMS"
 }
 
 BuildCollateralArray () {
@@ -139,6 +141,7 @@ BuildCollateralArray () {
 	DOWNLOADARRAY[15]="$1"$MAUID_ONEDRIVE
 	DOWNLOADARRAY[16]="$1"$MAUID_DEFENDER
 	DOWNLOADARRAY[17]="$1"$MAUID_EDGE
+	DOWNLOADARRAY[18]="$1"$MAUID_TEAMS
 }
 
 DownloadCollateralFiles () {
@@ -273,7 +276,9 @@ GetAppNameFromMAUID () {
 								;;
 		$MAUID_DEFENDER)		APPNAME="Defender ATP"
 								;;
-		$MAUID_EDGE)		APPNAME="Edge"
+		$MAUID_EDGE)			APPNAME="Edge"
+								;;
+		$MAUID_TEAMS)			APPNAME="Teams"
 								;;
 	esac
 	echo "$APPNAME"
