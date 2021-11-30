@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="3.0"
+TOOL_VERSION="3.1"
 
 ## Copyright (c) 2021 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -13,6 +13,27 @@ TOOL_VERSION="3.0"
 ## loss) arising out of the use of or inability to use the sample scripts or documentation, even if Microsoft has been advised of the possibility
 ## of such damages.
 ## Feedback: pbowden@microsoft.com
+
+# Configure automatic cleanup of old data. Make sure to account for older versions you may want to continue hosting.
+CLEANUP=false
+CLEANUP_DAYS=90
+
+# Variables for HipChat Notifications
+: "${HIPCHAT_NOTIFY:=false}"
+: "${HIPCHAT_NOTIFY_ADDRESS:=<PUT HIPCHAT ROOM ID HERE>}"
+: "${HIPCHAT_AUTH_TOKEN:=<PUT HIPCHAT AUTHTOKEN HERE>}"
+: "${HIPCHAT_ROOM_ID:=<PUT HIPCHAT ROOM ID HERE>}"
+
+# Variables for Slack Notifications
+: "${SLACK_NOTIFY:=false}"
+: "${SLACK_WEBHOOK_URL:=https://hooks.slack.com/services/<COMPLETE URL HERE>}"
+: "${SLACK_ICON_URL:=https://macadmins.software/icons/mau4.png}"
+
+# Variables for Microsoft Teams Notifications
+: "${TEAMS_NOTIFY:=false}"
+: "${TEAMS_WEBHOOK_URL:=https://outlook.office.com/webhook/<COMPLETE URL HERE>}"
+
+############################################################################################################
 
 # Constants
 MAUID_MAU4X="0409MSau04"
@@ -37,21 +58,6 @@ CHANNEL_COLLATERAL_PROD="https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdnmac.microsoft.com/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERFAST="https://officecdnmac.microsoft.com/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/MacAutoupdate/"
 SCRATCH_AREA="$TMPDIR""MAUCache"
-
-# Variables for HipChat Notifications
-: "${HIPCHAT_NOTIFY:=false}"
-: "${HIPCHAT_NOTIFY_ADDRESS:=<PUT HIPCHAT ROOM ID HERE>}"
-: "${HIPCHAT_AUTH_TOKEN:=<PUT HIPCHAT AUTHTOKEN HERE>}"
-: "${HIPCHAT_ROOM_ID:=<PUT HIPCHAT ROOM ID HERE>}"
-
-# Variables for Slack Notifications
-: "${SLACK_NOTIFY:=false}"
-: "${SLACK_WEBHOOK_URL:=https://hooks.slack.com/services/<COMPLETE URL HERE>}"
-: "${SLACK_ICON_URL:=https://macadmins.software/icons/mau4.png}"
-
-# Variables for Microsoft Teams Notifications
-: "${TEAMS_NOTIFY:=false}"
-: "${TEAMS_WEBHOOK_URL:=https://outlook.office.com/webhook/<COMPLETE URL HERE>}"
 
 # Platform detection
 PLATFORM=$(uname -s)
@@ -83,6 +89,29 @@ InitializeCacheArea () {
 		echo "Error: $CACHEPATH is not accessible"
 		echo
 		exit 1
+	fi
+}
+
+CleanupOldFiles () {
+# Cleanup old cache and manifest files
+	if [ $CLEANUP = true ]; then
+		echo "Touching legacy packages needed for older macOS versions to avoid re-download..."
+		touch "$CACHEPATH/Microsoft_Excel_16.30.19101301_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_Excel_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_OneNote_16.30.19101301_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_OneNote_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_Outlook_16.30.19101301_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_Outlook_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_PowerPoint_16.30.19101301_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_PowerPoint_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_Remote_Desktop_10.1.8_updater.pkg"
+		touch "$CACHEPATH/Microsoft_Remote_Desktop_10.2.13_updater.pkg"
+		touch "$CACHEPATH/Microsoft_Remote_Desktop_10.3.12_updater.pkg"
+		touch "$CACHEPATH/Microsoft_Remote_Desktop_10.5.2_updater.pkg"
+		touch "$CACHEPATH/Microsoft_Word_16.30.19101301_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_Word_16.43.20110804_Updater.pkg"
+		echo "Removing old files..."
+		find "$CACHEPATH" -type f -mtime +"$CLEANUP_DAYS" -print -delete
 	fi
 }
 
@@ -412,7 +441,7 @@ else
     	CHECKINTERVAL=${KEY#*:}
     	shift # past argument
     	;;
-    	--HTTPOnly|-h|--httponly)
+    	--HTTPOnly|-u|--httponly)
     	HTTPONLY=true
     	shift # past argument
     	;;
@@ -456,6 +485,8 @@ do
 	InitializeScratchArea
 	# Verify that the cache area is ready to go
 	InitializeCacheArea
+	#Cleanup old cache and manifest files
+	CleanupOldFiles
 	# Build channel array
 	CHANNELS[0]="$CHANNEL_COLLATERAL_PROD"
 	if [ $INSIDER ]; then
