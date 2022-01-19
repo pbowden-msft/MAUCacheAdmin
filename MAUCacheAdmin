@@ -2,9 +2,9 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="3.1"
+TOOL_VERSION="3.2"
 
-## Copyright (c) 2021 Microsoft Corp. All rights reserved.
+## Copyright (c) 2022 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
 ## Microsoft disclaims all implied warranties including, without limitation, any implied warranties of merchantability or of fitness for a
 ## particular purpose. The entire risk arising out of the use or performance of the scripts and documentation remains with you. In no event shall
@@ -53,7 +53,7 @@ MAUID_REMOTEDESKTOP10="0409MSRD10"
 MAUID_ONEDRIVE="0409ONDR18"
 MAUID_DEFENDER="0409WDAV00"
 MAUID_EDGE="0409EDGE01"
-MAUID_TEAMS="0409TEAM01"
+MAUID_TEAMS="0409TEAMS10"
 CHANNEL_COLLATERAL_PROD="https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdnmac.microsoft.com/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERFAST="https://officecdnmac.microsoft.com/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/MacAutoupdate/"
@@ -96,20 +96,26 @@ CleanupOldFiles () {
 # Cleanup old cache and manifest files
 	if [ $CLEANUP = true ]; then
 		echo "Touching legacy packages needed for older macOS versions to avoid re-download..."
+		touch "$CACHEPATH/Microsoft_AutoUpdate_4.40.21101001_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_Excel_16.30.19101301_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_Excel_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_Excel_16.54.21101001_Updater.pkg"		
 		touch "$CACHEPATH/Microsoft_OneNote_16.30.19101301_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_OneNote_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_OneNote_16.54.21101001_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_Outlook_16.30.19101301_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_Outlook_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_Outlook_16.54.21101001_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_PowerPoint_16.30.19101301_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_PowerPoint_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_PowerPoint_16.54.21101001_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_Remote_Desktop_10.1.8_updater.pkg"
 		touch "$CACHEPATH/Microsoft_Remote_Desktop_10.2.13_updater.pkg"
 		touch "$CACHEPATH/Microsoft_Remote_Desktop_10.3.12_updater.pkg"
 		touch "$CACHEPATH/Microsoft_Remote_Desktop_10.5.2_updater.pkg"
 		touch "$CACHEPATH/Microsoft_Word_16.30.19101301_Updater.pkg"
 		touch "$CACHEPATH/Microsoft_Word_16.43.20110804_Updater.pkg"
+		touch "$CACHEPATH/Microsoft_Word_16.54.21101001_Updater.pkg"
 		echo "Removing old files..."
 		find "$CACHEPATH" -type f -mtime +"$CLEANUP_DAYS" -print -delete
 	fi
