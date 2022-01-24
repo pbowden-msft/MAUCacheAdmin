@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="3.2"
+TOOL_VERSION="3.3"
 
 ## Copyright (c) 2022 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -54,6 +54,7 @@ MAUID_ONEDRIVE="0409ONDR18"
 MAUID_DEFENDER="0409WDAV00"
 MAUID_EDGE="0409EDGE01"
 MAUID_TEAMS="0409TEAMS10"
+MAUID_OFFICELICHELPER="0409OLIC02"
 CHANNEL_COLLATERAL_PROD="https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdnmac.microsoft.com/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERFAST="https://officecdnmac.microsoft.com/pr/4B2D7701-0A4F-49C8-B4CB-0C2D4043F51F/MacAutoupdate/"
@@ -152,6 +153,7 @@ BuildApplicationArray () {
 	MAUAPP[15]="$MAUID_DEFENDER"
 	MAUAPP[16]="$MAUID_EDGE"
 	MAUAPP[17]="$MAUID_TEAMS"
+	MAUAPP[18]="$MAUID_OFFICELICHELPER"
 }
 
 BuildCollateralArray () {
@@ -174,6 +176,7 @@ BuildCollateralArray () {
 	DOWNLOADARRAY[15]="$1"$MAUID_DEFENDER
 	DOWNLOADARRAY[16]="$1"$MAUID_EDGE
 	DOWNLOADARRAY[17]="$1"$MAUID_TEAMS
+	DOWNLOADARRAY[18]="$1"$MAUID_OFFICELICHELPER
 }
 
 DownloadCollateralFiles () {
@@ -280,7 +283,7 @@ GetAppNameFromMAUID () {
 								;;
 		$MAUID_EXCEL2019)		APPNAME="Excel 365/2021/2019"
 								;;
-		$MAUID_POWERPOINT2019)		APPNAME="PowerPoint 365/2021/2019"
+		$MAUID_POWERPOINT2019)	APPNAME="PowerPoint 365/2021/2019"
 								;;
 		$MAUID_OUTLOOK2019)		APPNAME="Outlook 365/2021/2019"
 								;;
@@ -290,7 +293,7 @@ GetAppNameFromMAUID () {
 								;;
 		$MAUID_EXCEL2016)		APPNAME="Excel 2016"
 								;;
-		$MAUID_POWERPOINT2016)		APPNAME="PowerPoint 2016"
+		$MAUID_POWERPOINT2016)	APPNAME="PowerPoint 2016"
 								;;
 		$MAUID_OUTLOOK2016)		APPNAME="Outlook 2016"
 								;;
@@ -300,7 +303,7 @@ GetAppNameFromMAUID () {
 								;;
 		$MAUID_INTUNECP)		APPNAME="Intune Company Portal"
 								;;
-		$MAUID_REMOTEDESKTOP10)		APPNAME="Remote Desktop v10"
+		$MAUID_REMOTEDESKTOP10)	APPNAME="Remote Desktop v10"
 								;;
 		$MAUID_ONEDRIVE)		APPNAME="OneDrive"
 								;;
@@ -309,6 +312,8 @@ GetAppNameFromMAUID () {
 		$MAUID_EDGE)			APPNAME="Edge"
 								;;
 		$MAUID_TEAMS)			APPNAME="Teams"
+								;;
+		$MAUID_OFFICELICHELPER)	APPNAME="Office Licensing Helper"
 								;;
 	esac
 	echo "$APPNAME"
