@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="3.3"
+TOOL_VERSION="3.4"
 
 ## Copyright (c) 2022 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -67,7 +67,7 @@ ShowUsage () {
 # Shows tool usage and parameters
 	echo $TOOL_NAME - $TOOL_VERSION
 	echo "Purpose: Downloads MAU collateral and packages from the Office CDN to a local web server"
-	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--HTTPOnly] [--NoPackages] [--NoCollateral] [--ShowCollateral] [--CopyCollateralFrom:<from Folder>] [--CopyCollateralTo:<to Folder>] [--InsiderSupport]"
+	echo "Usage: MAUCacheAdmin --CachePath:<path> [--CheckInterval:<minutes>] [--CleanUp] [--HTTPOnly] [--NoPackages] [--NoCollateral] [--ShowCollateral] [--CopyCollateralFrom:<from Folder>] [--CopyCollateralTo:<to Folder>] [--InsiderSupport]"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CheckInterval:60"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --ShowCollateral"
 	echo "Example: MAUCacheAdmin --CachePath:/Volumes/web/MAU/cache --CopyCollateralFrom:15.27.16101000 --CopyCollateralTo:Production"
@@ -440,50 +440,54 @@ else
 	for KEY in "$@"
 	do
 	case $KEY in
-    	--Help|-h|--help)
-    	ShowUsage
-    	shift # past argument
-    	;;
-    	--CachePath:*|-c:*|--cachepath:*)
-    	CACHEPATH=${KEY#*:}
-    	shift # past argument
-    	;;
-    	--CheckInterval:*|-i:*|--checkinterval:*)
-    	CHECKINTERVAL=${KEY#*:}
-    	shift # past argument
-    	;;
-    	--HTTPOnly|-u|--httponly)
-    	HTTPONLY=true
-    	shift # past argument
-    	;;
-    	--NoPackages|-np|--nopackages)
-    	NOPACKAGES=true
-    	shift # past argument
-    	;;
-    	--NoCollateral|-n|--nocollateral)
-    	NOCOLLATERAL=true
-    	shift # past argument
-    	;;
-    	--ShowCollateral|-sc|--showcollateral)
-    	ShowCollateral
-    	shift # past argument
-    	;;
-    	--CopyCollateralFrom:*|-ccf:*|--copycollateralfrom:*)
-    	COPYCOLLATERALFROM=${KEY#*:}
-    	shift # past argument
-    	;;
-    	--CopyCollateralTo:*|-cct:*|--copycollateralto:*)
-    	COPYCOLLATERALTO=${KEY#*:}
-    	CopyCollateral
-    	shift # past argument
-    	;;
-    	--InsiderSupport|-is|--insidersupport)
-    	INSIDER=true
-    	shift # past argument
-    	;;
-    	*)
-    	ShowUsage
-    	;;
+		--Help|-h|--help)
+		ShowUsage
+		shift # past argument
+		;;
+		--CachePath:*|-c:*|--cachepath:*)
+		CACHEPATH=${KEY#*:}
+		shift # past argument
+		;;
+		--CheckInterval:*|-i:*|--checkinterval:*)
+		CHECKINTERVAL=${KEY#*:}
+		shift # past argument
+		;;
+		--CleanUp|-cu|--cleanup)
+		CLEANUP=true
+		shift # past argument
+		;;
+		--HTTPOnly|-u|--httponly)
+		HTTPONLY=true
+		shift # past argument
+		;;
+		--NoPackages|-np|--nopackages)
+		NOPACKAGES=true
+		shift # past argument
+		;;
+		--NoCollateral|-n|--nocollateral)
+		NOCOLLATERAL=true
+		shift # past argument
+		;;
+		--ShowCollateral|-sc|--showcollateral)
+		ShowCollateral
+		shift # past argument
+		;;
+		--CopyCollateralFrom:*|-ccf:*|--copycollateralfrom:*)
+		COPYCOLLATERALFROM=${KEY#*:}
+		shift # past argument
+		;;
+		--CopyCollateralTo:*|-cct:*|--copycollateralto:*)
+		COPYCOLLATERALTO=${KEY#*:}
+		CopyCollateral
+		shift # past argument
+		;;
+		--InsiderSupport|-is|--insidersupport)
+		INSIDER=true
+		shift # past argument
+		;;
+		*)
+		ShowUsage
+		;;
 	esac
 	shift # past argument or value
 	done
