@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="3.4"
+TOOL_VERSION="3.5"
 
 ## Copyright (c) 2022 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -322,7 +322,7 @@ GetAppNameFromMAUID () {
 GetDownloadSize () {
 # Gets the size of a file based on its header, then strips non-numeric characters
 	URL="$1"
-	local CONTENTHTTPLENGTH=$(curl --head -s $URL | grep -i 'Content-Length' | cut -d ' ' -f2)
+	local CONTENTHTTPLENGTH=$(curl --head -s $URL | grep -i 'Content-Length:' | cut -d ' ' -f2)
 	CONTENTLENGTH=$(echo ${CONTENTHTTPLENGTH//[!0-9]/})
 	echo $CONTENTLENGTH
 }
