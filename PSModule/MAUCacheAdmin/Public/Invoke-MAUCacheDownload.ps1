@@ -68,12 +68,12 @@ function Invoke-MAUCacheDownload {
             $cacheIsValid = $false
         }
 
-        if ($targetCacheItem.Length -ne $dlJob.SizeBytes) {
+        if ($cacheIsValid -and $targetCacheItem.Length -ne $dlJob.SizeBytes) {
             Write-Warning "Package $($dlJob.Payload) exists in the cache but the file size does not match... Will redownload"
             $cacheIsValid = $false
         }
 
-        if ($CompareLastModified -and $cacheIsValid -and $targetCacheItem.LastWriteTimeUtc -ne $dlJob.LastModified) {
+        if ($cacheIsValid -and $CompareLastModified -and $targetCacheItem.LastWriteTimeUtc -ne $dlJob.LastModified) {
             Write-Warning "Package $($dlJob.Payload) exists in the cache but the Last Modified does not match... Will redownload"
             $cacheIsValid = $false
         }
