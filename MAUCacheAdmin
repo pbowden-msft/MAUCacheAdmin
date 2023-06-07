@@ -2,9 +2,9 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="3.5"
+TOOL_VERSION="3.6"
 
-## Copyright (c) 2022 Microsoft Corp. All rights reserved.
+## Copyright (c) 2023 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
 ## Microsoft disclaims all implied warranties including, without limitation, any implied warranties of merchantability or of fitness for a
 ## particular purpose. The entire risk arising out of the use or performance of the scripts and documentation remains with you. In no event shall
@@ -216,6 +216,9 @@ ArchiveCollateralFiles () {
 		cp "$SCRATCH_AREA/$APPID-chk.xml" "$CACHEPATH/collateral/$APPVER"
 		cp "$SCRATCH_AREA/$APPID.xml" "$CACHEPATH/collateral/$APPVER"
 		cp "$SCRATCH_AREA/$APPID.cat" "$CACHEPATH/collateral/$APPVER"
+		# Disable versioned manifests
+		# NOTE: The following command will only work on macOS
+		/usr/libexec/PlistBuddy -c "Set :VersionedManifests bool false" "$CACHEPATH/collateral/$APPVER/$APPID-chk.xml" >/dev/null 2>&1;
 	fi
 }
 
