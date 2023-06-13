@@ -60,7 +60,7 @@ function Get-MAUApp {
 
     # Process App History XML
     Write-Verbose "$logPrefix Getting App History Packages"
-    [string[]]$historicAppVersions = Get-PlistObjectFromURI -URI $app.CollateralURIs.HistoryXML -HttpClient $HttpClient
+    [string[]]$historicAppVersions = Get-PlistObjectFromURI -URI $app.CollateralURIs.HistoryXML -HttpClient $HttpClient -Optional
     if ($null -eq $historicAppVersions) {
         # Leave HistoricPackages empty ( -history.xml files are optional and only on certain apps )
         Write-Verbose "$logPrefix No App history XML found"
