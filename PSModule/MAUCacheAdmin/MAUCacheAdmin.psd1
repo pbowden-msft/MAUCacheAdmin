@@ -12,7 +12,7 @@
 RootModule = 'MAUCacheAdmin.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.1'
+ModuleVersion = '1.0.2'
 
 # ID used to uniquely identify this module
 GUID = '41ac64b9-6f2c-46a2-9d55-e6fb6c3d75ad'

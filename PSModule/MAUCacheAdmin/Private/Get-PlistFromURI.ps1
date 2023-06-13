@@ -6,7 +6,9 @@ function Get-PlistObjectFromURI {
         $URI,
         [Parameter(Mandatory=$true)]
         [System.Net.Http.HttpClient]
-        $HttpClient
+        $HttpClient,
+        [Switch]
+        $Optional
     )
     $logPrefix = "$($MyInvocation.MyCommand):"
     Write-Verbose "$logPrefix Processing $URI"
@@ -15,12 +17,12 @@ function Get-PlistObjectFromURI {
         [xml]$xmlObject = $HttpClient.GetStringAsync($URI).GetAwaiter().GetResult()
     }
     catch [System.Net.Http.HttpRequestException] {
-        # Use the StatusCode for dotnet 5+ and fall back to parsing the error string in older dotnets
-        if ($_.Exception.StatusCode -eq [System.Net.HttpStatusCode]::BadRequest -or $_.Exception.Message -like "*400 (Bad Request)*") {
-            # Return null if no response was found ( EG -history.xml files are only on certain apps )
-            # The MAU CDN does not return 404s, it always returns a 400 Bad Request when requesting a file that doesn't
-            # so we assume that 400 = 404 in and hope the upstream caller handles this appropriately
-            Write-Verbose "$logPrefix Received HTTP BadRequest (400) response from $URI"
+        # Return null if $Optional is set
+        if ($Optional) {
+            # Return null if no response was found ( EG -history.xml files are only on certain apps ).
+            # The MAU CDN does not consistently return 404s, seems to also return 400 Bad Request sometimes when requesting a file that doesn't exist
+            # so we don't bother checking the response code and just assume if there is a request exception and its Optional, we return null.
+            Write-Verbose "$logPrefix Request for $URI Returned $($_.Exception.Message)"
             return $null
         }
         # Rethrow the exception if it was not handled
