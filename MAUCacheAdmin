@@ -2,7 +2,7 @@
 #set -x
 
 TOOL_NAME="Microsoft AutoUpdate Cache Admin"
-TOOL_VERSION="3.6"
+TOOL_VERSION="3.7"
 
 ## Copyright (c) 2023 Microsoft Corp. All rights reserved.
 ## Scripts are not supported under any Microsoft standard support program or service. The scripts are provided AS IS without warranty of any kind.
@@ -54,6 +54,7 @@ MAUID_ONEDRIVE="0409ONDR18"
 MAUID_DEFENDER="0409WDAV00"
 MAUID_EDGE="0409EDGE01"
 MAUID_TEAMS="0409TEAMS10"
+MAUID_TEAMS2="0409TEAMS21"
 MAUID_OFFICELICHELPER="0409OLIC02"
 CHANNEL_COLLATERAL_PROD="https://officecdnmac.microsoft.com/pr/C1297A47-86C4-4C1F-97FA-950631F94777/MacAutoupdate/"
 CHANNEL_COLLATERAL_INSIDERSLOW="https://officecdnmac.microsoft.com/pr/1ac37578-5a24-40fb-892e-b89d85b6dfaa/MacAutoupdate/"
@@ -153,7 +154,8 @@ BuildApplicationArray () {
 	MAUAPP[15]="$MAUID_DEFENDER"
 	MAUAPP[16]="$MAUID_EDGE"
 	MAUAPP[17]="$MAUID_TEAMS"
-	MAUAPP[18]="$MAUID_OFFICELICHELPER"
+	MAUAPP[18]="$MAUID_TEAMS2"
+	MAUAPP[19]="$MAUID_OFFICELICHELPER"
 }
 
 BuildCollateralArray () {
@@ -176,7 +178,8 @@ BuildCollateralArray () {
 	DOWNLOADARRAY[15]="$1"$MAUID_DEFENDER
 	DOWNLOADARRAY[16]="$1"$MAUID_EDGE
 	DOWNLOADARRAY[17]="$1"$MAUID_TEAMS
-	DOWNLOADARRAY[18]="$1"$MAUID_OFFICELICHELPER
+	DOWNLOADARRAY[18]="$1"$MAUID_TEAMS2
+	DOWNLOADARRAY[19]="$1"$MAUID_OFFICELICHELPER
 }
 
 DownloadCollateralFiles () {
@@ -314,7 +317,9 @@ GetAppNameFromMAUID () {
 								;;
 		$MAUID_EDGE)			APPNAME="Edge"
 								;;
-		$MAUID_TEAMS)			APPNAME="Teams"
+		$MAUID_TEAMS)			APPNAME="Teams 1.0 classic"
+								;;
+		$MAUID_TEAMS2)			APPNAME="Teams 2.1"
 								;;
 		$MAUID_OFFICELICHELPER)	APPNAME="Office Licensing Helper"
 								;;

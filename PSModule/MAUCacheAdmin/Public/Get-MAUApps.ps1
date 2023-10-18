@@ -40,7 +40,8 @@ function Get-MAUApps {
         [PSCustomObject]@{AppID = "0409ONDR18";     AppName = "OneDrive"}
         [PSCustomObject]@{AppID = "0409WDAV00";     AppName = "Defender ATP"}
         [PSCustomObject]@{AppID = "0409EDGE01";     AppName = "Edge"}
-        [PSCustomObject]@{AppID = "0409TEAMS10";    AppName = "Teams"}
+        [PSCustomObject]@{AppID = "0409TEAMS10";    AppName = "Teams 1.0 classic"}
+        [PSCustomObject]@{AppID = "0409TEAMS21";    AppName = "Teams 2.1"}
         [PSCustomObject]@{AppID = "0409OLIC02";     AppName = "Office Licensing Helper"}
     )
 
