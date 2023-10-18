@@ -317,9 +317,9 @@ GetAppNameFromMAUID () {
 								;;
 		$MAUID_EDGE)			APPNAME="Edge"
 								;;
-		$MAUID_TEAMS)			APPNAME="Teams"
+		$MAUID_TEAMS)			APPNAME="Teams 1.0 classic"
 								;;
-		$MAUID_TEAMS2)			APPNAME="Teams 2.x"
+		$MAUID_TEAMS2)			APPNAME="Teams 2.1"
 								;;
 		$MAUID_OFFICELICHELPER)	APPNAME="Office Licensing Helper"
 								;;
